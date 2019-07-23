@@ -13060,24 +13060,14 @@ static int _update_job(job_record_t *job_ptr, job_desc_msg_t *job_specs,
 			sched_debug("%s: new memory limit identical to old limit for %pJ",
 				    __func__, job_ptr);
 		} else {
-			char *entity;
 			if (job_specs->pn_min_memory == MEM_PER_CPU) {
 				/* Map --mem-per-cpu=0 to --mem=0 */
 				job_specs->pn_min_memory = 0;
 			}
-			if (job_specs->pn_min_memory & MEM_PER_CPU)
-				entity = "cpu";
-			else
-				entity = "job";
-
 			detail_ptr->pn_min_memory = job_specs->pn_min_memory;
 			detail_ptr->orig_pn_min_memory =
 					job_specs->pn_min_memory;
 			job_ptr->bit_flags |= JOB_MEM_SET;
-			sched_info("%s: setting min_memory_%s to %"PRIu64" for %pJ",
-				   __func__, entity,
-				   (job_specs->pn_min_memory & (~MEM_PER_CPU)),
-				   job_ptr);
 			/*
 			 * Always use the acct_policy_limit_set.*
 			 * since if set by a super user it be set correctly
