@@ -70,6 +70,7 @@ documents those changes that are of interest to users and administrators.
     Reason=Resources.
  -- cons_tres - Fix --gres-flags=enforce-binding.
  -- cons_tres - Fix cpus-per-gpu handling.
+ -- cons_tres - Allocate lowest numbered cores.
 
 * Changes in Slurm 20.02.1
 ==========================
