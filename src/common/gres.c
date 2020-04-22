@@ -8006,6 +8006,7 @@ extern void gres_plugin_job_core_filter3(gres_mc_data_t *mc_ptr,
 			 * If enforce binding number of gres assigned per
 			 * socket, have to keep cpus_per_gres in mind.
 			 */
+			/* if cpus_per_gres && ? */
 			if (enforce_binding || first_pass) {
 				int tmp = MAX(1, cpus_per_gres);
 				int max_gres_socket = (avail_cores_per_sock[s] *
@@ -8049,6 +8050,9 @@ extern void gres_plugin_job_core_filter3(gres_mc_data_t *mc_ptr,
 				continue;
 			}
 
+			/* Can this go below the continue? Then we don't have
+			 * to worry about decrementing negative avaiL_cores_tot
+			 * below. */
 			avail_cores_tot += avail_cores_per_sock[s];
 			/* Test for available cores on this socket */
 			if ((enforce_binding || first_pass) &&
@@ -8074,6 +8078,8 @@ extern void gres_plugin_job_core_filter3(gres_mc_data_t *mc_ptr,
 					if (!bit_test(avail_core, i))
 						continue;
 					bit_clear(avail_core, i);
+					/* We can be decrementing off cores that
+					 * didn't make it into the count. */
 					avail_cores_tot--;
 					avail_cores_per_sock[s]--;
 					if ((bit_set_count(avail_core) *
@@ -8118,6 +8124,8 @@ extern void gres_plugin_job_core_filter3(gres_mc_data_t *mc_ptr,
 				sock_gres->total_cnt =
 					MIN(i, sock_gres->total_cnt);
 			}
+			/* without the removing of cores above we wouldn't
+			 * filter out bad cores. Comment 18 */
 			continue;
 		}
 
@@ -8165,6 +8173,10 @@ extern void gres_plugin_job_core_filter3(gres_mc_data_t *mc_ptr,
 					    cpus_per_core < *avail_cpus) {
 						*avail_cpus -= cpus_per_core;
 					}
+					/*
+					 * Have a reproducer for this?
+					avail_cores_per_socket[s]--;
+					 */
 					if (--avail_cores_tot == req_cores)
 						break;
 				}
